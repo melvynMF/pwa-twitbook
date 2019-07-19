@@ -39,16 +39,15 @@ class ChatApp extends LitElement {
       bottom: 0;
       width: 100%;
     }
-    footer form {
+    form {
       display: flex;
       justify-content: space-between;
       background-color: #ffffff;
       padding: 0.5rem 1rem;
-      width: 100%;
+      width: 30%;
+      margin-left:20em;
     }
-    footer form input {
-      width: 100%;
-    }
+
     ul {
       position: relative;
       display: flex;
@@ -62,16 +61,28 @@ class ChatApp extends LitElement {
       display: block;
       padding: 0.5rem 1rem;
       margin-bottom: 1rem;
-      background-color: #cecece;
+    
       border-radius: 0 30px 30px 0;
       width: 70%;
     }
     ul li.own {
       align-self: flex-end;
-      text-align: right;
-      background-color: #16a7f1;
-      color: #ffffff;
+      text-align: left;
       border-radius: 30px 0 0 30px;
+      margin-right:10em;
+    }
+
+    ul li.other {
+      align-self: flex-end;
+      text-align: left;
+      border-radius: 30px 0 0 30px;
+      margin-right:10em;
+      background-color:aliceblue;
+    }
+
+    textarea{
+      width:45em;
+      height:10em;
     }
   `;
 }
@@ -138,29 +149,29 @@ class ChatApp extends LitElement {
            <div class="item"><chat-auth @user-logged="${this.handleLogin}"></chat-auth></div>
            <chat-login @user-logged="${this.handleLogin}"></chat-login>
             `: html`
-             <h2>Hi, ${this.user.email}</h2>
+             <h2>Hi, ${this.user.email.substring(0, this.user.email.lastIndexOf("@"))}</h2>
              <small @click="${this.logout}">logout</small>
-
              <button @click="${this.subscribe}">Subscribe</button>
+
+             <form @submit="${this.sendMessage}">
+                <textarea placeholder="Votre tweet" .value="${this.message}"  @input="${e => this.message = e.target.value}" > </textarea> <br>
+                <button type="submit">Send</button>
+              </form>
+
              <ul>
                ${this.messages.map(message => html`
                  <li
-                   class="${message.user == this.user.uid ? 'own': ''}">
-                   <strong>${message.email} said :</strong>
-                   <span>${message.content} - ${this.getDate(message.date)}</span>
+                   class="${message.user == this.user.uid ? 'own': 'other'}">
+                   <strong>${message.email.substring(0, message.email.lastIndexOf("@"))}</strong><br>
+                   <span>${message.content} <br>
+                   ${this.getDate(message.date)}</span>
                  </li>
                `)}
              </ul>
            </main>
-           <footer>
-             <form @submit="${this.sendMessage}">
-               <input
-                 type="text"
-                 placeholder="Send new message ..."
-                 .value="${this.message}"
-                 @input="${e => this.message = e.target.value}">
-               <button type="submit">Send</button>
-             </form>
+     
+          
+            <footer>
            </footer>
            `
          }
