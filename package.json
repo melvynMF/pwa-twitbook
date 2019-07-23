@@ -13,6 +13,7 @@
     "lit-element": "^2.1.0"
   },
   "devDependencies": {
-    "polymer-cli": "^1.9.9"
+    "polymer-cli": "^1.9.9",
+    "workbox-cli": "^4.3.1"
   }
 }
