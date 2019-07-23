@@ -22,13 +22,19 @@ export class ChatStore extends LitElement {
         firebase.firestore().collection(this.collection).orderBy('date', 'asc').onSnapshot(ref => {
             ref.docChanges().forEach(change => {
                 const { newIndex, oldIndex, doc, type } = change;
+
+                
                 if(type == 'added') {
-                    this.data = [...this.data,doc.data()] ;
+               
+                    this.data = [...this.data, doc.data()];
+                    
                     this.dispatchEvent(new CustomEvent('child-changed', {detail: this.data}));
                 } else if (type == 'removed') {
                     this.data.splice(oldIndex, 1);
                     this.dispatchEvent(new CustomEvent('child-changed', {detail: this.data}));
                 }
+
+
             });
         });
     }

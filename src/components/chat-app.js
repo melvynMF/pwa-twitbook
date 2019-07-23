@@ -136,11 +136,11 @@ class ChatApp extends LitElement {
  render() {
    return html`
      <section>
-       <!--<chat-data
+       <chat-data
          id="data"
          path="messages"
          @child-changed="${this.messageAdded}">
-       </chat-data>-->
+       </chat-data>
        <chat-store
          collection="messages"
          @child-changed="${this.messageAdded}">
