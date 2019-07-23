@@ -101,13 +101,14 @@ class ChatApp extends LitElement {
 
     this.database.collection('messages').add({
       content: this.message,
-      user: this.user.uid,
+      user: {'id':this.user.uid,'email':this.user.email},
       email: this.user.email,
       date: new Date().getTime()
     });
     this.message = '';
   
  }
+
 
  sendSubscription() {
   if (Notification.permission === 'granted') {
@@ -129,6 +130,8 @@ class ChatApp extends LitElement {
       });
   }
 }
+
+
 
  render() {
    return html`
@@ -160,11 +163,17 @@ class ChatApp extends LitElement {
 
              <ul>
                ${this.messages.map(message => html`
-                 <li
-                   class="${message.user == this.user.uid ? 'own': 'other'}">
-                   <strong>${message.email.substring(0, message.email.lastIndexOf("@"))}</strong><br>
+
+               <!-- On vérifie c'est mon tweet ou bien celui d'un autre que j'ai retweeté -->
+
+                 <li class="${message.user.id == this.user.uid ? 'other': 'own'}">
+                  
+                  <span style="${message.user.email.substring(0, message.user.email.lastIndexOf("@")) != message.email.substring(0, message.email.lastIndexOf("@")) ? 'display:block;':'display:none'}" id="pseudo-message-retweet" >${ message.user.email != this.user.email ? message.user.email+" a retweeté" : ''  }</span>
+                   <strong id="pseudo-message" >${message.email.substring(0, message.email.lastIndexOf("@"))}</strong><br>
                    <span>${message.content} <br>
                    ${this.getDate(message.date)}</span>
+                   <br>
+                   <button class="RT-btn" style="${message.user.id != this.user.uid ? 'display:block;': 'display:none;'}" @click="${(e) => this.retweet(message)}">Retwetter</button>
                  </li>
                `)}
              </ul>
@@ -198,6 +207,14 @@ class ChatApp extends LitElement {
   }
 }
 
+isRetweet(){
+  var pseudoMessageRetweet = document.getElementById("pseudo-message-retweet");
+  var pseudoMessage = document.getElementById("pseudo-message");
+  console.log(pseudoMessageRetweet.innerHTML)
+  console.log(pseudoMessage.innerHTML)
+
+}
+
 logout(){
     // Déconnexion Firebase
     firebase.auth().signOut().then(function() {
@@ -206,6 +223,24 @@ logout(){
       alert('Erreur')
     });
   }
+
+retweet(message){
+    console.log(this.user)
+    //console.log(message)
+    this.database = firebase.firestore();
+
+
+
+    this.database.collection('messages').add({
+      content: message.content,
+      user: { 'id':this.user.uid,'email':this.user.email },
+      email: message.email,
+      date: message.date
+    });
+    
+  
+
+}
 
 urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
