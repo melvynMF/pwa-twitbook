@@ -9,15 +9,15 @@ class ChatHeader extends LitElement {
                 background-color: #ffffff;
             }
             header {
-                height: 48px;
+                height: 80px;
+
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                border-bottom: solid #eeeeee 1px;
             }
             img {
-                height: 42px;
-                width: 42px;
+                height: 80px;
+                width: 80px;
                 display: block;
             }
         `;
@@ -25,7 +25,7 @@ class ChatHeader extends LitElement {
 
     render() {
         return html `
-            <header><img src="./src/assets/images/1f680.png" alt="Logo"> Firechat</header>
+            <img src="./src/assets/images/1f680.png" alt="Logo">
         `;
     }
 }

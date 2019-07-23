@@ -14,6 +14,7 @@ class ChatApp extends LitElement {
    this.message = "";
    this.messages = [];
    this.logged = false;
+   
  }
  static get properties() {
    return {
@@ -42,7 +43,6 @@ class ChatApp extends LitElement {
     form {
       display: flex;
       justify-content: space-between;
-      background-color: #ffffff;
       padding: 0.5rem 1rem;
       width: 30%;
       margin-left:20em;
@@ -84,6 +84,18 @@ class ChatApp extends LitElement {
       width:45em;
       height:10em;
     }
+
+
+    .button {
+  background-color: #F16759; 
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
   `;
 }
  firstUpdated() {
@@ -93,21 +105,38 @@ class ChatApp extends LitElement {
  }
  handleLogin(e) {
    this.user = e.detail.user;
-   this.logged = localStorage.getItem('logged') == 'true' ? true : false;
+   this.logged =
+    localStorage.getItem('logged') == 'true' ? true : false;
  }
+
  sendMessage(e) {
    e.preventDefault();
    this.database = firebase.firestore();
 
     this.database.collection('messages').add({
       content: this.message,
-      user: {'id':this.user.uid,'email':this.user.email},
+      user: this.user.uid,
       email: this.user.email,
+      likes : 0,
       date: new Date().getTime()
     });
     this.message = '';
   
  }
+
+ 
+ like(message) {
+  this.database = firebase.firestore(); // firebase data base
+  let user = firebase.auth().currentUser; // utilisateur connecté
+  console.log(message);
+
+ firebase.firestore().collection("messages").doc(message.user).update({
+  likes: 1
+})
+
+
+}
+
 
 
  sendSubscription() {
@@ -131,10 +160,50 @@ class ChatApp extends LitElement {
   }
 }
 
-
-
  render() {
    return html`
+
+   <style>
+   .logout {
+    background-color: #EA1C45;
+
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    }
+
+
+    .logout:hover{
+      background-color:hover: #EA1C45;
+      }
+      textarea{
+                background: ##D9E9F0;
+      }
+
+
+.send {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.submit{
+  display: block;
+  margin-left: auto;
+  margin-right: auto
+
+
+}
+  </style>
      <section>
        <!--<chat-data
          id="data"
@@ -152,30 +221,31 @@ class ChatApp extends LitElement {
            <div class="item"><chat-auth @user-logged="${this.handleLogin}"></chat-auth></div>
            <chat-login @user-logged="${this.handleLogin}"></chat-login>
             `: html`
-             <h2>Hi, ${this.user.email.substring(0, this.user.email.lastIndexOf("@"))}</h2>
-             <small @click="${this.logout}">logout</small>
-             <button @click="${this.subscribe}">Subscribe</button>
+             <h2>Bonjour, ${this.user.email.substring(0, this.user.email.lastIndexOf("@"))}</h2>
+             <button class="logout"  @click="${this.logout}">Déconnexion</button>
 
-             <form @submit="${this.sendMessage}">
+             <form class="submit" @submit="${this.sendMessage}">
                 <textarea placeholder="Votre tweet" .value="${this.message}"  @input="${e => this.message = e.target.value}" > </textarea> <br>
-                <button type="submit">Send</button>
+                <button class="send" type="submit">Send</button>
               </form>
 
              <ul>
                ${this.messages.map(message => html`
-
-               <!-- On vérifie c'est mon tweet ou bien celui d'un autre que j'ai retweeté -->
-
-                 <li class="${message.user.id == this.user.uid ? 'other': 'own'}">
-                  
-                  <span style="${message.user.email.substring(0, message.user.email.lastIndexOf("@")) != message.email.substring(0, message.email.lastIndexOf("@")) ? 'display:block;':'display:none'}" id="pseudo-message-retweet" >${ message.user.email != this.user.email ? message.user.email+" a retweeté" : ''  }</span>
-                   <strong id="pseudo-message" >${message.email.substring(0, message.email.lastIndexOf("@"))}</strong><br>
+                 <li
+                   class="${message.user == this.user.uid ? 'own': 'other'}">
+                   <strong>${message.email.substring(0, message.email.lastIndexOf("@"))}</strong><br>
                    <span>${message.content} <br>
                    ${this.getDate(message.date)}</span>
-                   <br>
-                   <button class="RT-btn" style="${message.user.id != this.user.uid ? 'display:block;': 'display:none;'}" @click="${(e) => this.retweet(message)}">Retwetter</button>
+
+                  <button  @click="${ (e)=>{ this.like(message)}}">❤️</button>
+                  
+              
                  </li>
                `)}
+               
+                
+
+                
              </ul>
            </main>
      
@@ -207,14 +277,6 @@ class ChatApp extends LitElement {
   }
 }
 
-isRetweet(){
-  var pseudoMessageRetweet = document.getElementById("pseudo-message-retweet");
-  var pseudoMessage = document.getElementById("pseudo-message");
-  console.log(pseudoMessageRetweet.innerHTML)
-  console.log(pseudoMessage.innerHTML)
-
-}
-
 logout(){
     // Déconnexion Firebase
     firebase.auth().signOut().then(function() {
@@ -223,24 +285,6 @@ logout(){
       alert('Erreur')
     });
   }
-
-retweet(message){
-    console.log(this.user)
-    //console.log(message)
-    this.database = firebase.firestore();
-
-
-
-    this.database.collection('messages').add({
-      content: message.content,
-      user: { 'id':this.user.uid,'email':this.user.email },
-      email: message.email,
-      date: message.date
-    });
-    
-  
-
-}
 
 urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
