@@ -115,7 +115,7 @@ class ChatApp extends LitElement {
 
     this.database.collection('messages').add({
       content: this.message,
-      user: this.user.uid,
+      user: {'id':this.user.uid,'email':this.user.email},
       email: this.user.email,
       likes : 0,
       date: new Date().getTime()
@@ -238,7 +238,8 @@ display: block;
                    ${this.getDate(message.date)}</span>
 
                   <button  @click="${ (e)=>{ this.like(message)}}">❤️</button>
-                  
+                  <button style="${message.user.id != this.user.uid ? 'display:block;': 'display:none;'}" @click="${(e) => this.retweet(message)}">Retwetter</button>
+
               
                  </li>
                `)}
@@ -285,7 +286,32 @@ logout(){
       alert('Erreur')
     });
   }
+  isRetweet(){
+    var pseudoMessageRetweet = document.getElementById("pseudo-message-retweet");
+    var pseudoMessage = document.getElementById("pseudo-message");
+    console.log(pseudoMessageRetweet.innerHTML)
+    console.log(pseudoMessage.innerHTML)
+  
+  }
+  
 
+  retweet(message){
+    console.log(this.user)
+    //console.log(message)
+    this.database = firebase.firestore();
+
+
+
+    this.database.collection('messages').add({
+      content: message.content,
+      user: { 'id':this.user.uid,'email':this.user.email },
+      email: message.email,
+      date: message.date
+    });
+    
+  
+
+}
 urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
