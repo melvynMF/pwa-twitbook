@@ -303,9 +303,6 @@ logout(){
     console.log(this.user)
     //console.log(message)
     this.database = firebase.firestore();
-
-
-
     this.database.collection('messages').add({
       content: this.user.email.substring(0, this.user.email.lastIndexOf("@"))+' a retweeter "'+message.content+'"',
       user: { 'id':this.user.uid,'email':this.user.email },
