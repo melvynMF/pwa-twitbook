@@ -14,6 +14,7 @@ class ChatApp extends LitElement {
    this.message = "";
    this.messages = [];
    this.logged = false;
+   
  }
  static get properties() {
    return {
@@ -93,8 +94,10 @@ class ChatApp extends LitElement {
  }
  handleLogin(e) {
    this.user = e.detail.user;
-   this.logged = localStorage.getItem('logged') == 'true' ? true : false;
+   this.logged =
+    localStorage.getItem('logged') == 'true' ? true : false;
  }
+
  sendMessage(e) {
    e.preventDefault();
    this.database = firebase.firestore();
@@ -103,11 +106,27 @@ class ChatApp extends LitElement {
       content: this.message,
       user: this.user.uid,
       email: this.user.email,
+      likes : 0,
       date: new Date().getTime()
     });
     this.message = '';
   
  }
+
+ 
+ like(message) {
+  this.database = firebase.firestore(); // firebase data base
+  let user = firebase.auth().currentUser; // utilisateur connecté
+  console.log(message);
+
+ firebase.firestore().collection("messages").doc(message.user).update({
+  likes: 1
+})
+
+
+}
+
+
 
  sendSubscription() {
   if (Notification.permission === 'granted') {
@@ -165,8 +184,16 @@ class ChatApp extends LitElement {
                    <strong>${message.email.substring(0, message.email.lastIndexOf("@"))}</strong><br>
                    <span>${message.content} <br>
                    ${this.getDate(message.date)}</span>
+
+                  <button  @click="${ (e)=>{ this.like(message)}}">❤️</button>
+                  
+              
                  </li>
                `)}
+               
+                
+
+                
              </ul>
            </main>
      
