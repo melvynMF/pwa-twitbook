@@ -205,11 +205,11 @@ class ChatApp extends LitElement {
 }
   </style>
      <section>
-       <!--<chat-data
+       <chat-data
          id="data"
          path="messages"
          @child-changed="${this.messageAdded}">
-       </chat-data>-->
+       </chat-data>
        <chat-store
          collection="messages"
          @child-changed="${this.messageAdded}">
