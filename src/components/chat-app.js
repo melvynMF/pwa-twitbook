@@ -152,6 +152,7 @@ class ChatApp extends LitElement {
            <div class="item"><chat-auth @user-logged="${this.handleLogin}"></chat-auth></div>
            <chat-login @user-logged="${this.handleLogin}"></chat-login>
             `: html`
+
              <h2>Hi, ${this.user.email.substring(0, this.user.email.lastIndexOf("@"))}</h2>
              <small @click="${this.logout}">logout</small>
              <button @click="${this.subscribe}">Subscribe</button>
@@ -228,9 +229,6 @@ retweet(message){
     console.log(this.user)
     //console.log(message)
     this.database = firebase.firestore();
-
-
-
     this.database.collection('messages').add({
       content: message.content,
       user: { 'id':this.user.uid,'email':this.user.email },
