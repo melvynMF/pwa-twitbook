@@ -1,48 +1,4 @@
-console.log('Service worker loaded');
 
-
- // Names of the two caches used in this version of the service worker.
-// Change to v2, etc. when you update any of the local resources, which will
-// in turn trigger the install event again.
-const PRECACHE = 'precache-v1';
-const RUNTIME = 'runtime';
-
-// A list of local resources we always want to be cached.
-const PRECACHE_URLS = [
-  '/index.html',
-  '/',
-  '/src/assets/images/1f680.png',
-  '/src/components/data/chat-auth.js',
-  '/src/components/data/chat-data.js',
-  '/src/components/data/chat-login.js',
-  '/src/components/data/chat-profile.js',
-  '/src/components/data/chat-chat-store.js',
-  '/src/components/layout/navigation/chat-header.js',
-  '/src/components/chat-app.js'
-];
-
-// The install handler takes care of precaching the resources we always need.
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(PRECACHE)
-      .then(cache => cache.addAll(PRECACHE_URLS))
-      .then(self.skipWaiting())
-  );
-});
-
-// The activate handler takes care of cleaning up old caches.
-self.addEventListener('activate', event => {
-  const currentCaches = [PRECACHE, RUNTIME];
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return cacheNames.filter(cacheName => !currentCaches.includes(cacheName));
-    }).then(cachesToDelete => {
-      return Promise.all(cachesToDelete.map(cacheToDelete => {
-        return caches.delete(cacheToDelete);
-      }));
-    }).then(() => self.clients.claim())
-  );
-});
 
 // The fetch handler serves responses for same-origin resources from a cache.
 // If no response is found, it populates the runtime cache with the response
@@ -56,7 +12,7 @@ self.addEventListener('fetch', event => {
           return cachedResponse;
         }
 
-        return caches.open(RUNTIME).then(cache => {
+        return caches.open('runtime').then(cache => {
           return fetch(event.request).then(response => {
             // Put a copy of the response in the runtime cache.
             return cache.put(event.request, response.clone()).then(() => {
@@ -67,4 +23,41 @@ self.addEventListener('fetch', event => {
       })
     );
   }
+});
+
+self.addEventListener("install", function(event) {
+  console.log('WORKER: install event in progress.');
+  event.waitUntil(
+    /* The caches built-in is a promise-based API that helps you cache responses,
+       as well as finding and deleting them.
+    */
+    caches
+      /* You can open a cache by name, and this method returns a promise. We use
+         a versioned cache name here so that we can remove old cache entries in
+         one fell swoop later, when phasing out an older service worker.
+      */
+      .open(version + 'fundamentals')
+      .then(function(cache) {
+        /* After the cache is opened, we can fill it with the offline fundamentals.
+           The method below will add all resources we've indicated to the cache,
+           after making HTTP requests for each of them.
+        */
+        return cache.addAll([
+          '/index.html',
+          '/',
+          '/src/assets/images/1f680.png',
+          '/src/components/data/chat-auth.js',
+          '/src/components/data/chat-data.js',
+          '/src/components/data/chat-login.js',
+          '/src/components/data/chat-profile.js',
+          '/src/components/data/chat-chat-store.js',
+          '/src/components/layout/navigation/chat-header.js',
+          '/src/components/chat-app.js',
+          
+        ]);
+      })
+      .then(function() {
+        console.log('WORKER: install completed');
+      })
+  );
 });
