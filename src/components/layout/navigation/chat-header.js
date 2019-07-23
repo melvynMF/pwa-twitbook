@@ -16,8 +16,8 @@ class ChatHeader extends LitElement {
                 align-items: center;
             }
             img {
-                height: 80px;
-                width: 80px;
+                height: 42px;
+                width: 42px;
                 display: block;
             }
         `;

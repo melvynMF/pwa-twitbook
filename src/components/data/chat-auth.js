@@ -36,7 +36,7 @@ export class ChatAuth extends LitElement {
           firebase.firestore().collection('users').doc(data.user.uid).set({
             followings : [],
             followers : [],
-            likes : 0
+            likes : []
           })
         });
       }

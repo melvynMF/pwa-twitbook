@@ -117,7 +117,7 @@ class ChatApp extends LitElement {
       content: this.message,
       user: {'id':this.user.uid,'email':this.user.email},
       email: this.user.email,
-      likes : 0,
+        likes : [],
       date: new Date().getTime()
     });
     this.message = '';
@@ -176,7 +176,10 @@ class ChatApp extends LitElement {
     font-size: 16px;
     }
 
+    .float{
+      float:right;
 
+    }
     .logout:hover{
       background-color:hover: #EA1C45;
       }
@@ -236,9 +239,10 @@ display: block;
                    <strong>${message.email.substring(0, message.email.lastIndexOf("@"))}</strong><br>
                    <span>${message.content} <br>
                    ${this.getDate(message.date)}</span>
-
-                  <button  @click="${ (e)=>{ this.like(message)}}">❤️</button>
+                <div>
+                  <button style="${message.user.id != this.user.uid ? 'display:block;': 'display:none;'}" class="float" @click="${ (e)=>{ this.like(message)}}">❤️</button>
                   <button style="${message.user.id != this.user.uid ? 'display:block;': 'display:none;'}" @click="${(e) => this.retweet(message)}">Retwetter</button>
+                </div>
 
               
                  </li>
@@ -303,7 +307,7 @@ logout(){
 
 
     this.database.collection('messages').add({
-      content: message.content,
+      content: this.user.email.substring(0, this.user.email.lastIndexOf("@"))+' a retweeter "'+message.content+'"',
       user: { 'id':this.user.uid,'email':this.user.email },
       email: message.email,
       date: message.date
