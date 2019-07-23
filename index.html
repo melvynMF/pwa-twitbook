@@ -33,6 +33,7 @@
                 width: 42px;
                 display: block;
             }
+            
         </style>
         <script>
             (() => {
@@ -41,6 +42,18 @@
                 }
             })();
         </script>
+        <script async>
+            // Load CardElement CSS
+            const cardStyle = document.createElement('link');
+            cardStyle.href = 'js/components/card/card.css';
+            cardStyle.rel = "stylesheet";
+            document.head.appendChild(cardStyle);
+          </script>
+          <script nomodule>
+            const script = document.createElement('script');
+            script.src = './js/app.js';
+            document.head.appendChild(script);
+          </script>
     </head>
     <body>
             <script src="https://www.gstatic.com/firebasejs/6.3.1/firebase-app.js"></script>
